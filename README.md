@@ -1,6 +1,6 @@
 # homebridge-webos-notification
 
-`homebridge-webos-notification` is a plugin for Homebridge which allows you to send notification to your webOS TV! It should work with all TVs that support webOS2 and newer. This is based on [homebridge-webos-tv](https://github.com/merdok/homebridge-webos-tv) with only notification function.
+`homebridge-webos-notification` is a plugin for Homebridge which allows you to send notification to your webOS TV! It should work with all TVs that support webOS2 and newer. This is based on [homebridge-webos-tv](https://github.com/merdok/homebridge-webos-tv) with only notification function. All credit goes to original author.
 
 ### Features
 * Show notifications
@@ -31,7 +31,7 @@ Example configuration:
   "accessories": [
     {
       "accessory": "webos-notification",
-      "name": "webOS",
+      "name": "webOS Notification",
       "ip": "192.168.0.2",
       "mac": "ab:cd:ef:fe:dc:ba",
       "keyFile": "/var/lib/homebridge/webostv/lgtvKeyFile",
@@ -66,11 +66,11 @@ If homebridge runs on a host with more than one network interface use this to sp
 - `keyFile` [optional]
 To prevent the TV from asking for permission when you reboot homebridge, specify a file path to store the permission token. If the file doesn't exist it'll be created. Don't specify a directory or you'll get an `EISDIR` error.
 - `prefsDir` [optional]
-The directory where input names and TV model info should be saved. **Default: "~/.webosTv"**
+The directory where input names and TV model info should be saved.
 - `pollingInterval` [optional]
 The TV state background polling interval in seconds. **Default: 5**
-- `notificationButtons` [optional] 
-Wheter the notification buttons service is enabled. This allows to create buttons which when pressed display the specified text on the TV screen. Useful for HomeKit automation or to display text on TV for viewers. **Default: "" (disabled)**
+- `notificationButtons` [required] 
+Wheter the notification buttons service is enabled. This allows to create buttons which when pressed display the specified text on the TV screen. Useful for HomeKit automation or to display text on TV for viewers.
   - Set an array of notification texts as the value
   
 ## Troubleshooting
