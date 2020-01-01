@@ -1,6 +1,6 @@
 # homebridge-webos-notification
 
-`homebridge-webos-notification` is a plugin for Homebridge which allows you to send notification to your webOS TV! It should work with all TVs that support webOS2 and newer. This is based on [homebridge-webos-tv](https://github.com/merdok/homebridge-webos-tv) with only notification function. All credit goes to original author.
+`homebridge-webos-notification` is a plugin for Homebridge which allows you to send notification to your webOS TV! It should work with all TVs that support webOS2 and newer. This is based on [homebridge-webos-tv](https://github.com/merdok/homebridge-webos-tv) with only notification function. All credits go to original authors.
 
 ### Features
 * Show notifications
