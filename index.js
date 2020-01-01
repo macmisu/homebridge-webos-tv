@@ -54,14 +54,14 @@ class webosNotificationAccessory {
 		// create the lgtv instance
 		this.lgtv = new Lgtv2({
 			url: this.url,
-			timeout: 5000,
+			timeout: 6000,
 			reconnect: 3000,
 			keyFile: this.keyFile
 		});
 
 		// start the polling
 		if (!this.checkAliveInterval) {
-			this.checkAliveInterval = setInterval(this.checkTVState.bind(this, this.updateTvStatus.bind(this)), this.alivePollingInterval);
+			this.checkAliveInterval = setInterval(this.checkTVState(), this.alivePollingInterval);
 		}
 
 		//register to listeners
@@ -145,24 +145,6 @@ class webosNotificationAccessory {
 					}
 				}
 			});
-
-			this.lgtv.request('ssap://com.webos.service.update/getCurrentSWInformation', (err, res) => {
-				if (!res || err || res.errorCode) {
-					this.log.info('webOS - sw information - error while getting sw information');
-				} else {
-					delete res['returnValue'];
-					this.log.info('webOS - sw information:' + '\n' + JSON.stringify(res, null, 2));
-				}
-			});
-
-			this.lgtv.request('ssap://api/getServiceList', (err, res) => {
-				if (!res || err || res.errorCode) {
-					this.log.info('webOS - service list - error while getting service list');
-				} else {
-					delete res['returnValue'];
-					this.log.info('webOS - service list:' + '\n' + JSON.stringify(res, null, 2));
-				}
-			});
 		}, 100);
 	}
 
@@ -210,7 +192,7 @@ class webosNotificationAccessory {
 			let infoArr = JSON.parse(fs.readFileSync(this.tvInfoFile));
 			modelName = infoArr.modelName;
 		} catch (err) {
-			this.log.info('webOS - input names file does not exist');
+			this.log.info('webOS - tv info file does not exist');
 		}
 
 		// there is currently no way to update the AccessoryInformation service after it was added to the service list
@@ -256,29 +238,20 @@ class webosNotificationAccessory {
 	// --== HELPER METHODS ==--
 	disableAllServiceButtons(service) {
 		if (service) {
-			// we need to wait a moment (10ms) till we can disable the button
+			// we need to wait a moment (100ms) till we can disable the button
 			setTimeout(() => {
 				service.forEach((tmpServiceButton, i) => {
 					tmpServiceButton.getCharacteristic(Characteristic.On).updateValue(false);
 				});
-			}, 10);
-		}
-	}
-	
-	updateTvStatus(error, tvStatus) {
-		if (!tvStatus) {
-			this.log.info('webOS - TV state: off');
-		} else {
-			this.log.info('webOS - TV state: on');
+			}, 100);
 		}
 	}
 
-	checkTVState(callback) {
+	checkTVState() {
 		tcpp.probe(this.ip, this.port, (err, isAlive) => {
 			if (!isAlive && this.connected) {
 				this.log.info('webOS - TV state: Off');
 				this.disconnect();
-				callback(null, false);
 			} else if (isAlive && !this.connected) {
 				this.lgtv.connect(this.url);
 				this.log.info('webOS - TV state: got response from TV, connecting...');
