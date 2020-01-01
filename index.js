@@ -22,7 +22,7 @@ class webosNotificationAccessory {
 
 		// configuration
 		this.ip = config['ip'];
-		this.name = config['name'] || 'webOS';
+		this.name = config['name'] || 'webOS Notification';
 		this.mac = config['mac'];
 		this.broadcastAdr = config['broadcastAdr'] || '255.255.255.255';
 		this.keyFile = config['keyFile'];
@@ -62,7 +62,7 @@ class webosNotificationAccessory {
 
 		// start the polling
 		if (!this.checkAliveInterval) {
-			this.checkAliveInterval = setInterval(this.checkTVState.bind(this, null), this.alivePollingInterval);
+			this.checkAliveInterval = setInterval(this.checkTVState.bind(this, this.updateTvStatus.bind(this)), this.alivePollingInterval);
 		}
 
 		//register to listeners
@@ -239,7 +239,7 @@ class webosNotificationAccessory {
 		this.notificationButtonService = new Array();
 		this.notificationButtons.forEach((value, i) => {
 			this.notificationButtons[i] = this.notificationButtons[i].toString();
-			let tmpNotification = new Service.Switch(this.name + ' Notification: ' + value, 'notificationButtonService' + i);
+			let tmpNotification = new Service.Switch(this.name + ': ' + value, 'notificationButtonService' + i);
 			tmpNotification
 				.getCharacteristic(Characteristic.On)
 				.on('get', (callback) => {
@@ -263,6 +263,14 @@ class webosNotificationAccessory {
 					tmpServiceButton.getCharacteristic(Characteristic.On).updateValue(false);
 				});
 			}, 10);
+		}
+	}
+	
+	updateTvStatus(error, tvStatus) {
+		if (!tvStatus) {
+			this.log.debug('webOS - TV state: off');
+		} else {
+			this.log.debug('webOS - TV state: on');
 		}
 	}
 
