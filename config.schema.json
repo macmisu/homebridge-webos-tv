@@ -7,7 +7,7 @@
       "name": {
         "title": "Name",
         "type": "string",
-        "default": "webOS",
+        "default": "webOS Notification",
         "minLength": 1,
         "required": true
       },
@@ -48,7 +48,7 @@
         "items": {
           "type": "string"
         },
-        "required": false
+        "required": true
       }
     }
   }
