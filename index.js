@@ -22,7 +22,7 @@ class webosNotificationAccessory {
 
 		// configuration
 		this.ip = config['ip'];
-		this.name = config['name'] || 'webOS TV';
+		this.name = config['name'] || 'webOS';
 		this.mac = config['mac'];
 		this.broadcastAdr = config['broadcastAdr'] || '255.255.255.255';
 		this.keyFile = config['keyFile'];
@@ -221,7 +221,7 @@ class webosNotificationAccessory {
 			.setCharacteristic(Characteristic.Manufacturer, 'LG Electronics Inc.')
 			.setCharacteristic(Characteristic.Model, modelName)
 			.setCharacteristic(Characteristic.SerialNumber, this.mac)
-			.setCharacteristic(Characteristic.FirmwareRevision, '1.6.3');
+			.setCharacteristic(Characteristic.FirmwareRevision, '1.0.0');
 
 		this.enabledServices.push(this.informationService);
 	}
