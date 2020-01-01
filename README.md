@@ -31,7 +31,7 @@ Example configuration:
   "accessories": [
     {
       "accessory": "webos-notification",
-      "name": "webOS tv",
+      "name": "webOS",
       "ip": "192.168.0.2",
       "mac": "ab:cd:ef:fe:dc:ba",
       "keyFile": "/var/lib/homebridge/webostv/lgtvKeyFile",
