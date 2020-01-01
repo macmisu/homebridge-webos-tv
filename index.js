@@ -35,7 +35,6 @@ class webosNotificationAccessory {
 		this.url = 'ws://' + this.ip + ':' + this.port;
 		this.enabledServices = [];
 		this.connected = false;
-		this.checkCount = 0;
 		this.checkAliveInterval = null;
 
 		// check if prefs directory ends with a /, if not then add it
@@ -61,19 +60,19 @@ class webosNotificationAccessory {
 
 		// start the polling
 		if (!this.checkAliveInterval) {
-			this.checkAliveInterval = setInterval(this.checkTVState(), this.alivePollingInterval);
+			this.checkAliveInterval = setInterval(this.checkTVState.bind(this), this.alivePollingInterval);
 		}
 
 		//register to listeners
 		this.lgtv.on('connect', () => {
-			this.log.info('webOS - connected to TV, checking power status');
+			this.log.debug('webOS - connected to TV, checking power status');
 			this.lgtv.request('ssap://com.webos.service.tvpower/power/getPowerState', (err, res) => {
 				if (err || (res && res.state && res.state === 'Active Standby')) {
-					this.log.info('webOS - power status - TV is Off or Pixel Refresher is running, disconnecting');
+					this.log.debug('webOS - power status - TV is Off or Pixel Refresher is running, disconnecting');
 					this.connected = false;
 					this.lgtv.disconnect();
 				} else {
-					this.log.info('webOS - power status - TV is On');
+					this.log.debug('webOS - power status - TV is On');
 					this.connected = true;
 					this.connect();
 				}
@@ -81,7 +80,7 @@ class webosNotificationAccessory {
 		});
 
 		this.lgtv.on('close', () => {
-			this.log.info('webOS - disconnected from TV');
+			this.log.debug('webOS - disconnected from TV');
 			this.connected = false;
 		});
 
@@ -90,12 +89,12 @@ class webosNotificationAccessory {
 		});
 
 		this.lgtv.on('prompt', () => {
-			this.log.info('webOS - prompt for confirmation');
+			this.log.debug('webOS - prompt for confirmation');
 			this.connected = false;
 		});
 
 		this.lgtv.on('connecting', () => {
-			this.log.info('webOS - connecting to TV');
+			this.log.debug('webOS - connecting to TV');
 			this.connected = false;
 		});
 
@@ -123,25 +122,25 @@ class webosNotificationAccessory {
 	// --== INIT HELPER METHODS ==--
 	getTvInformation() {
 		setTimeout(() => {
-			this.log.info('webOS - requesting TV information');
+			this.log.debug('webOS - requesting TV information');
 
 			this.lgtv.request('ssap://system/getSystemInfo', (err, res) => {
 				if (!res || err || res.errorCode) {
-					this.log.info('webOS - system info - error while getting system info');
+					this.log.debug('webOS - system info - error while getting system info');
 				} else {
 					delete res['returnValue'];
-					this.log.info('webOS - system info:' + '\n' + JSON.stringify(res, null, 2));
+					this.log.debug('webOS - system info:' + '\n' + JSON.stringify(res, null, 2));
 					// save the tv info to a file if does not exists
 					if (fs.existsSync(this.tvInfoFile) === false) {
 						fs.writeFile(this.tvInfoFile, JSON.stringify(res), (err) => {
 							if (err) {
-								this.log.info('webOS - error occured could not write tv info %s', err);
+								this.log.debug('webOS - error occured could not write tv info %s', err);
 							} else {
-								this.log.info('webOS - tv info successfully saved!');
+								this.log.debug('webOS - tv info successfully saved!');
 							}
 						});
 					} else {
-						this.log.info('webOS - tv info file already exists, not saving!');
+						this.log.debug('webOS - tv info file already exists, not saving!');
 					}
 				}
 			});
@@ -149,7 +148,7 @@ class webosNotificationAccessory {
 	}
 
 	subscribeToServices() {
-		this.log.info('webOS - subscribing to TV services');
+		this.log.debug('webOS - subscribing to TV services');
 
 		// power status
 		this.lgtv.subscribe('ssap://com.webos.service.tvpower/power/getPowerState', (err, res) => {
@@ -173,7 +172,7 @@ class webosNotificationAccessory {
 					powerState = powerState + ' power on reason: ' + statusPowerOnReason + ',';
 				}
 
-				this.log.info('webOS - TV power status changed, status: %s', powerState);
+				this.log.debug('webOS - TV power status changed, status: %s', powerState);
 
 				// if pixel refresher is running then disconnect from TV
 				if (statusState === 'Active Standby') {
@@ -192,7 +191,7 @@ class webosNotificationAccessory {
 			let infoArr = JSON.parse(fs.readFileSync(this.tvInfoFile));
 			modelName = infoArr.modelName;
 		} catch (err) {
-			this.log.info('webOS - tv info file does not exist');
+			this.log.debug('webOS - tv info file does not exist');
 		}
 
 		// there is currently no way to update the AccessoryInformation service after it was added to the service list
@@ -247,14 +246,14 @@ class webosNotificationAccessory {
 		}
 	}
 
-	checkTVState() {
+	checkTVState(callback) {
 		tcpp.probe(this.ip, this.port, (err, isAlive) => {
 			if (!isAlive && this.connected) {
-				this.log.info('webOS - TV state: Off');
+				this.log.debug('webOS - TV state: Off');
 				this.disconnect();
 			} else if (isAlive && !this.connected) {
 				this.lgtv.connect(this.url);
-				this.log.info('webOS - TV state: got response from TV, connecting...');
+				this.log.debug('webOS - TV state: got response from TV, connecting...');
 			}
 		});
 	}
@@ -265,7 +264,7 @@ class webosNotificationAccessory {
 	}
 
 	setNotificationButtonState(state, callback, notification) {
-		if (this.connected) {
+		if (this.connected && state) {
 			this.log.info('webOS - notification button service - displaying notification with message: %s', notification);
 			this.lgtv.request('ssap://system.notifications/createToast', {
 				message: notification
