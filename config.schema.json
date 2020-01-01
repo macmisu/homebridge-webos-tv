@@ -7,7 +7,7 @@
       "name": {
         "title": "Name",
         "type": "string",
-        "default": "webOS TV",
+        "default": "webOS",
         "minLength": 1,
         "required": true
       },
