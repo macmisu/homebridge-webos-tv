@@ -85,7 +85,7 @@ class webosNotificationAccessory {
 		});
 
 		this.lgtv.on('error', (error) => {
-			this.log.error('webOS - %s', error);
+			this.log.error('webOS - connection issue - TV is probably Off');
 		});
 
 		this.lgtv.on('prompt', () => {
